@@ -1,13 +1,24 @@
 package com.bootcamp.bootcoin.service.impl;
 
+import com.bootcamp.bootcoin.bean.bootcoin.BootcoinRequest;
+import com.bootcamp.bootcoin.bean.bootcoin.Transaction;
+import com.bootcamp.bootcoin.dto.bootcoin.BootcoinRequestDto;
 import com.bootcamp.bootcoin.dto.bootcoin.ExchangeRateDto;
+import com.bootcamp.bootcoin.dto.bootcoin.TransactionDto;
+import com.bootcamp.bootcoin.dto.bootcoin.WalletDto;
+import com.bootcamp.bootcoin.repository.BootcoinRequestRepository;
 import com.bootcamp.bootcoin.repository.ExchangeRateRepository;
+import com.bootcamp.bootcoin.repository.TransactionRepository;
+import com.bootcamp.bootcoin.repository.WalletRepository;
 import com.bootcamp.bootcoin.service.BootcoinService;
 import com.bootcamp.bootcoin.util.AppUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.math.BigDecimal;
 
 @Slf4j
 @Service
@@ -21,6 +32,12 @@ public class BootcoinServiceImpl implements BootcoinService {
 
     @Autowired
     private ExchangeRateRepository exchangeRepo;
+    @Autowired
+    private BootcoinRequestRepository requestRepository;
+    @Autowired
+    private WalletRepository walletRepository;
+    @Autowired
+    private TransactionRepository transactionRepository;
 
     /**
      * El banco debe poder establecer la tasa de compra y venta de Soles a BootCoin.
@@ -40,6 +57,53 @@ public class BootcoinServiceImpl implements BootcoinService {
     @Autowired
     private RestTemplate restTemplate;*/
 
+    @Override
+    public Flux<BootcoinRequestDto> getRequestBootcoinBuy() {
+        log.debug("Service.getRequestBootcoinBuy");
+        return requestRepository.findAll()
+                .map(AppUtils::entityReqCoinToDto);
+    }
+    @Override
+    public Flux<BootcoinRequestDto> getRequestBootcoinBuy(String clientIdNumber) {
+        log.debug("Service.getRequestBootcoinBuy");
+        return requestRepository.findByClientIdNumber(clientIdNumber)
+                .map(AppUtils::entityReqCoinToDto);
+    }
+    @Override
+    public Mono<BootcoinRequestDto> saveRequestBootcoinBuy(Mono<BootcoinRequestDto> req) {
+        log.debug("Service.saveRequestBootcoinBuy");
+        return req.map(AppUtils::dtoToEntityReqCoin)
+                .flatMap(r -> {
+                    getExchangeRate().doOnNext(ex->r.setExchangeRateBuy(ex.getSell()));
+                    return requestRepository.insert(r);})
+                .map(AppUtils::entityReqCoinToDto);
+    }
+    @Override
+    public Mono<TransactionDto> acceptRequest(String req){
+             return requestRepository.findById(req)
+                     .flatMap(re -> transactionRepository.save(new Transaction(re.getClientIdNumber(), re.getClientIdNumberRequested(), re.getAmount(), re.getAmount().multiply(re.getExchangeRateBuy()) )) )
+                     .map(AppUtils::entityTransactToDto)
+                     .doOnNext(t -> {findWallet(t.getWalletNumberOrig()).doOnNext(w->w.setBalance(w.getBalance().subtract(t.getBootcoinAmount())))
+                                                .doOnNext(wa -> walletRepository.save(AppUtils.dtoToEntityWallet(wa)));
+                                     findWallet(t.getWalletNumberDest()).doOnNext(w->w.setBalance(w.getBalance().add(t.getBootcoinAmount())))
+                                                .doOnNext(wa -> walletRepository.save(AppUtils.dtoToEntityWallet(wa)));
+                                    });
+    }
+
+    private Mono<WalletDto> findWallet(String clientIdNumber) {
+        log.debug("In findWallet()");
+        return walletRepository.findByClientIdNumber(clientIdNumber).map(AppUtils::entityWalletToDto);
+    }
+    private Mono<WalletDto> updateWalletOrig(WalletDto wallet, BigDecimal amount) {
+        log.debug("In updateWalletOrig()");
+        wallet.setBalance(wallet.getBalance().subtract(amount));
+        return walletRepository.save(AppUtils.dtoToEntityWallet(wallet)).map(AppUtils::entityWalletToDto);
+    }
+    private Mono<WalletDto> updateWalletDest(WalletDto wallet, BigDecimal amount) {
+        log.debug("In updateWalletDest()");
+        wallet.setBalance(wallet.getBalance().add(amount));
+        return walletRepository.save(AppUtils.dtoToEntityWallet(wallet)).map(AppUtils::entityWalletToDto);
+    }
     /*
     public Flux<DepositDto> getDeposit() {
         log.debug("In getDeposit()");

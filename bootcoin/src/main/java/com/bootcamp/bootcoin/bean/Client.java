@@ -7,9 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-
 
 @Document(value = "client")
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -23,9 +21,9 @@ public class Client {
     @Id
     private String id;
     private String name;
+    private String clientIdType;
 
-    @Indexed(unique = true)
-    private String clientNumber;
+    private String clientIdNumber;
 
     private String email;
     private String phone;

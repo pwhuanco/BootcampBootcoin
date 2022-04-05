@@ -16,10 +16,11 @@ public class ClientDto {
     private String id;
     private String name;
 
-    private String clientNumber;
+    private String clientIdType;
+
+    private String clientIdNumber;
 
     private String email;
     private String phone;
     private String address;
-
 }
