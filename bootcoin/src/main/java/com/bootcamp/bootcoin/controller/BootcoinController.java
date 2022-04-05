@@ -49,7 +49,7 @@ public class BootcoinController {
         return bootcoinService.getRequestBootcoinBuy(idClient);
     }
     @PostMapping("/request")
-    public Mono<BootcoinRequestDto> saveRequestBuy(@RequestBody Mono<BootcoinRequestDto> depositDtoMono) {
+    public Mono<BootcoinRequestDto> saveRequestBuy(@RequestBody BootcoinRequestDto depositDtoMono) {
         LOGGER.debug("Saving BootcoinRequest!");
         return bootcoinService.saveRequestBootcoinBuy(depositDtoMono);
     }

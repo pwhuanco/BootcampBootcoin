@@ -16,7 +16,7 @@ public interface BootcoinService {
     Flux<BootcoinRequestDto> getRequestBootcoinBuy(String clientIdNumber);
     Flux<BootcoinRequestDto> getRequestBootcoinBuy();
 
-    Mono<BootcoinRequestDto> saveRequestBootcoinBuy(Mono<BootcoinRequestDto> req);
+    Mono<BootcoinRequestDto> saveRequestBootcoinBuy(BootcoinRequestDto req);
     Mono<TransactionDto> acceptRequest(String req);
     /*
     Flux<DepositDto> getDeposit();

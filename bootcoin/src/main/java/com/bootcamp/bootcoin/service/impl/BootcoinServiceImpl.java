@@ -70,13 +70,19 @@ public class BootcoinServiceImpl implements BootcoinService {
                 .map(AppUtils::entityReqCoinToDto);
     }
     @Override
-    public Mono<BootcoinRequestDto> saveRequestBootcoinBuy(Mono<BootcoinRequestDto> req) {
+    public Mono<BootcoinRequestDto> saveRequestBootcoinBuy(BootcoinRequestDto req) {
         log.debug("Service.saveRequestBootcoinBuy");
+        return getExchangeRate().flatMap(ex-> {
+            req.setExchangeRateBuy(ex.getSell());
+            return requestRepository.insert(AppUtils.dtoToEntityReqCoin(req)).map(AppUtils::entityReqCoinToDto);
+        });
+/*
         return req.map(AppUtils::dtoToEntityReqCoin)
                 .flatMap(r -> {
                     getExchangeRate().doOnNext(ex->r.setExchangeRateBuy(ex.getSell()));
-                    return requestRepository.insert(r);})
-                .map(AppUtils::entityReqCoinToDto);
+                    return requestRepository.insert(r);
+                })
+                .map(AppUtils::entityReqCoinToDto);*/
     }
     @Override
     public Mono<TransactionDto> acceptRequest(String req){
