@@ -1,6 +1,7 @@
 package com.bootcamp.bootcoin.bean.bootcoin;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -8,6 +9,7 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.math.BigDecimal;
+@Builder
 @Document("transaction")
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,8 +19,7 @@ public class Transaction {
     @Id
     private String id;
 
-    @Indexed(name = "transactionId")
-    private Integer transactionId = 0;
+    private Integer transactionId;
 
     private String walletNumberOrig;
     private String walletNumberDest;

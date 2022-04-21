@@ -4,6 +4,7 @@ import com.bootcamp.bootcoin.bean.bootcoin.BootcoinRequest;
 import com.bootcamp.bootcoin.dto.bootcoin.BootcoinRequestDto;
 import com.bootcamp.bootcoin.dto.bootcoin.ExchangeRateDto;
 import com.bootcamp.bootcoin.dto.bootcoin.TransactionDto;
+import com.bootcamp.bootcoin.dto.bootcoin.WalletDto;
 import com.bootcamp.bootcoin.service.BootcoinService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +27,17 @@ public class BootcoinController {
 
     @Resource
     private BootcoinService bootcoinService;
+
+    @GetMapping("/wallet/{idClient}")
+    public Mono<WalletDto> getExchangeRate(@PathVariable String idClient) {
+        LOGGER.debug("Saving WalletDto!"+idClient);
+        return bootcoinService.findWalletByIdClient(idClient);
+    }
+    @PostMapping("/wallet")
+    public Mono<WalletDto> setExchangeRate(@RequestBody WalletDto wallet) {
+        LOGGER.debug("Saving WalletDto!");
+        return bootcoinService.createWallet(wallet);
+    }
 
     @GetMapping("/exchange")
     public Mono<ExchangeRateDto> getExchangeRate() {

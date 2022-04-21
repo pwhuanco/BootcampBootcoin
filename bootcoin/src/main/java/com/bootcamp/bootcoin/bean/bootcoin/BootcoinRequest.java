@@ -25,7 +25,7 @@ public class BootcoinRequest {
      */
     private String clientIdNumberRequested;
 
-    private BigDecimal amount;
+    private BigDecimal bootcoinAmount;
     /**
      * cuentas 1,corriente 2,yanki 3
      */

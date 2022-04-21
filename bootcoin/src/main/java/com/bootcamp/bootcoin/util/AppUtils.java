@@ -8,8 +8,9 @@ import com.bootcamp.bootcoin.dto.bootcoin.BootcoinRequestDto;
 import com.bootcamp.bootcoin.dto.bootcoin.ExchangeRateDto;
 import com.bootcamp.bootcoin.dto.bootcoin.TransactionDto;
 import com.bootcamp.bootcoin.dto.bootcoin.WalletDto;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-
+@Slf4j
 public class AppUtils {
 
     public static ExchangeRateDto entityExToDto(ExchangeRate deposit) {
@@ -37,6 +38,7 @@ public class AppUtils {
     }
 
     public static WalletDto entityWalletToDto(Wallet deposit) {
+        log.debug("entityWalletToDto:{}",deposit);
         WalletDto accDto = new WalletDto();
         BeanUtils.copyProperties(deposit, accDto);
         return accDto;

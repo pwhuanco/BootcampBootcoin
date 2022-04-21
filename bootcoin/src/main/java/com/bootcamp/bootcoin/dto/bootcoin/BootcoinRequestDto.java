@@ -21,7 +21,7 @@ public class BootcoinRequestDto {
     private String id;
     private String clientIdNumber;
     private String clientIdNumberRequested;
-    private BigDecimal amount;
+    private BigDecimal bootcoinAmount;
     private String payMode;
     private BigDecimal exchangeRateBuy;
     private String timestamp;
